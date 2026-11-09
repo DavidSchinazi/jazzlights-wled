@@ -6,11 +6,15 @@ sync patterns with JazzLights devices over Wi-Fi and Bluetooth. The usermod and 
 live in the JazzLights repository; see
 [extras/docs/WLED.md](https://github.com/DavidSchinazi/jazzlights/blob/main/extras/docs/WLED.md).
 
-This repository only holds the releases, so that WLED's one-click update keeps a device on
-images with the usermod. Images built with the usermod point WLED's update page here, and
-WLED installs the asset of the latest release whose name ends in
+This repository only holds the releases. Images built with the usermod point WLED's
+update page here. To update, download the asset of the latest release whose name ends in
 `_<version>_<release name>.bin`, where the release name is the device's, such as
-`ESP32_JazzLights`.
+`ESP32_JazzLights`, and upload it on WLED's update page. WLED refuses stock images, which
+would remove the usermod.
+
+WLED's one-click update looks for that same asset, but downloads it through WLED's
+`download.wled.me` mirror, which only serves an allowlist of repositories that doesn't
+include this one. Until it does, one click fails without flashing anything.
 
 | Image | Board |
 |---|---|
