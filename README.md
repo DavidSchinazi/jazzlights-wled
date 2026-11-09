@@ -16,6 +16,7 @@ WLED installs the asset of the latest release whose name ends in
 |---|---|
 | `WLED_<version>_ESP32_JazzLights.bin` | ESP32, such as an M5Stack ATOM Matrix |
 | `WLED_<version>_ESP32-S3_8MB_none_JazzLights.bin` | ESP32-S3 with 8 MB of flash, such as an M5Stack ATOM S3 Lite |
+| `WLED_<version>_ESP32-S3_8MB_opi_JazzLights.bin` | ESP32-S3 with 8 MB of flash and 8 MB of octal PSRAM, such as an M5Stack ATOMS3R |
 | `WLED_<version>_ESP32-C3_JazzLights.bin` | ESP32-C3, such as an M5Stamp C3U |
 | `WLED_<version>_ESP32-C6_4MB_JazzLights.bin` | ESP32-C6 with 4 MB of flash, such as an M5Stack NanoC6 (no Bluetooth) |
 
