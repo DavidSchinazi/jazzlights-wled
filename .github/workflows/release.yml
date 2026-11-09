@@ -1,0 +1,61 @@
+# Builds WLED with the JazzLights usermod and publishes the images as a release of this repository, which is where
+# WLED's one-click update looks for them. See README.md.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: JazzLights branch, tag or commit to build
+        required: true
+        default: main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: DavidSchinazi/jazzlights
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install PlatformIO
+        run: pip install platformio
+      - name: Build
+        run: extras/wled/build.sh
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          wled_version="$(node -p "require('./extras/.wled/package.json').version")"
+          wled_commit="$(git -C extras/.wled rev-parse HEAD)"
+          jazzlights_commit="$(git rev-parse HEAD)"
+          # WLED's one-click update takes the latest release's tag, without a leading v, and installs the asset whose
+          # name ends in _<tag>_<release name>.bin. Each run gets its own version, so the same WLED version can be
+          # released again with newer JazzLights code.
+          version="${wled_version}-jl.${{ github.run_number }}"
+          mkdir release
+          shopt -s nullglob
+          for image in extras/.wled/build_output/release/WLED_"${wled_version}"_*_JazzLights.bin; do
+            name="$(basename "${image}")"
+            cp "${image}" "release/${name/_${wled_version}_/_${version}_}"
+          done
+          if [ -z "$(ls release)" ]; then
+            echo "No images were built." >&2
+            exit 1
+          fi
+          ls -l release
+          gh release create "v${version}" release/*.bin \
+            --repo "${{ github.repository }}" \
+            --latest \
+            --title "${version}" \
+            --notes "WLED ${wled_version} (wled/WLED@${wled_commit}) with the JazzLights usermod from DavidSchinazi/jazzlights@${jazzlights_commit}."
